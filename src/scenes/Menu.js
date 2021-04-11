@@ -11,7 +11,7 @@ class Menu extends Phaser.Scene {
      create() {
         this.add.text(210,20, "Rocket Patrol Main Menu");
         this.add.text(120,220, "Use the arrow keys to move, and F to fire!");
-        this.add.text(250,250, "Shoot to start :)");
+        this.add.text(250,250, "Shoot to start!");
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
     }
     update() {
