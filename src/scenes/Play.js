@@ -64,38 +64,53 @@ class Play extends Phaser.Scene {
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);      
 
-        // initialize score
-        this.p1Score = 0;
-
-         // display score
-        let scoreConfig = {
-            fontFamily: 'Courier',
-            fontSize: '28px',
-            backgroundColor: '#F3B141',
-            color: '#843605',
-            align: 'right',
-            padding: {
-            top: 5,
-            bottom: 5,
-            },
-            fixedWidth: 100
-        }
-        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
         // animation config
         this.anims.create({
             key: 'explode',
             frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9, first: 0}),
             frameRate: 30
 });
+        // initialize score
+        this.p1Score = 0;
 
+         // display score
+            let scoreConfig = {
+                fontFamily: 'Courier',
+                fontSize: '28px',
+                backgroundColor: '#F3B141',
+                color: '#843605',
+                align: 'right',
+                padding: {
+                top: 5,
+                bottom: 5,
+                },
+                fixedWidth: 100
+            }
+            this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
+        // GAME OVER flag
+        this.gameOver = false;
+
+        // 60-second play clock
+        scoreConfig.fixedWidth = 0;
+        this.clock = this.time.delayedCall(60000, () => {
+            this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart', scoreConfig).setOrigin(0.5);
+            this.gameOver = true;
+        }, null, this);
     }
 
     update() {
+          // check key input for restart
+         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
+        this.scene.restart();
+}
         this.starfield.tilePositionX -= 4;
+        if (!this.gameOver) {
         this.p1Rocket.update();
         this.ship1.update();
         this.ship2.update();
         this.ship3.update();
+    }
         
         this.checkCollision(this.p1Rocket, this.ship1);
         this.checkCollision(this.p1Rocket, this.ship2);
@@ -116,15 +131,17 @@ class Play extends Phaser.Scene {
     }
     shipExplode(ship) {
         // temporarily hide ship
-        ship.alpha = 0;
+        ship.alpha = 0;                         
         // create explosion sprite at ship's position
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
         boom.anims.play('explode');             // play explode animation
-        boom.on('animationcomplete', () => {    // callback after anim completes
-          ship.reset();                         // reset ship position
-          ship.alpha = 1;                       // make ship visible again
-          boom.destroy();                       // remove explosion sprite
-        });    
-           
+        boom.on('animationcomplete', () => {    // callback after ani completes
+          ship.reset();                       // reset ship position
+          ship.alpha = 1;                     // make ship visible again
+          boom.destroy();                     // remove explosion sprite
+        });
+        // score add and repaint
+        this.p1Score += 1;
+        this.scoreLeft.text = this.p1Score;       
       }
 }
