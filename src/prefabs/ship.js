@@ -17,3 +17,5 @@ class Ship extends Phaser.GameObjects.Sprite {
         this.alpha = 1;
     }
 }
+
+//recommitting with uppercase name!
