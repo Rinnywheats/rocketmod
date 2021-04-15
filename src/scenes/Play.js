@@ -149,5 +149,4 @@ class Play extends Phaser.Scene {
 }
 
 //POINTS:
-//60: Redesigned art, UI, and sound (I know that the explosion looks like it's glitched
-//but it's intentional i swear. They split and break, go further apart while flashing)
+//60: Redesigned art, UI, and sound
