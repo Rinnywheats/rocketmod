@@ -54,10 +54,10 @@ class Play extends Phaser.Scene {
             ).setOrigin(0,0);
 
         // white borders
-	    this.add.rectangle(0, 0, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0 ,0);
-	    this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0 ,0);
-	    this.add.rectangle(0, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0 ,0);
-	    this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0 ,0);
+	    this.add.rectangle(0, 0, game.config.width, borderUISize, 0x006400).setOrigin(0 ,0);
+	    this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0x006400).setOrigin(0 ,0);
+	    this.add.rectangle(0, 0, borderUISize, game.config.height, 0x006400).setOrigin(0 ,0);
+	    this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0x006400).setOrigin(0 ,0);
 
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -77,7 +77,7 @@ class Play extends Phaser.Scene {
             let scoreConfig = {
                 fontFamily: 'Courier',
                 fontSize: '28px',
-                backgroundColor: '#F3B141',
+                backgroundColor: '#afeeee',
                 color: '#843605',
                 align: 'right',
                 padding: {
@@ -129,6 +129,7 @@ class Play extends Phaser.Scene {
                 ship.reset();  
         }
     }
+
     shipExplode(ship) {
         // temporarily hide ship
         ship.alpha = 0;                         
@@ -146,3 +147,7 @@ class Play extends Phaser.Scene {
         this.sound.play('sfx_explosion');
       }
 }
+
+//POINTS:
+//60: Redesigned art, UI, and sound (I know that the explosion looks like it's glitched
+//but it's intentional i swear. They split and break, go further apart while flashing)
