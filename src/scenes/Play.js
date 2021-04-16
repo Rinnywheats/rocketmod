@@ -4,8 +4,11 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('bullet', './assets/fireball.png');
+        //this.load.image('bullet', './assets/fireball.png');
+        this.load.image('bush', './assets/bushe.png');
+        this.load.image('bat', './assets/battychan.png');
         this.load.image('starfield', './assets/starfield.png');
+        this.load.image('frame', './assets/Frame.png');
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.spritesheet('srollin', './assets/walkin.png', {frameWidth: 70, frameHeight: 95, startFrame: 0, endFrame: 3});
@@ -18,12 +21,10 @@ class Play extends Phaser.Scene {
             0,0,640,480, 'starfield'
         ).setOrigin(0,0);
 
-        this.p1Rocket = new Rocket(
-            this,
-            game.config.width/2,
-            game.config.height - borderUISize - borderPadding,
-            'rocket'
-        );
+        this.bush = this.add.tileSprite(
+            0,0,640,480, 'bush'
+        ).setOrigin(0,0);
+
 
         this.ship1 = new Ship(
             this,
@@ -31,6 +32,13 @@ class Play extends Phaser.Scene {
             200,
             'spaceship'
         );
+
+        this.batship = new batship(
+            this,
+            100,
+            125,
+            'bat'
+        )
 
         this.ship2 = new Ship(
             this,
@@ -46,6 +54,20 @@ class Play extends Phaser.Scene {
             'spaceship'
         );
 
+        
+        this.frame = this.add.tileSprite(
+            0,0,640,480, 'frame'
+        ).setOrigin(0,0);
+
+        
+        this.p1Rocket = new Rocket(
+            this,
+            game.config.width/2,
+            game.config.height - 25,
+            'rocket'
+        );
+
+
         // green UI background
         this.add.rectangle(
             0,
@@ -56,10 +78,10 @@ class Play extends Phaser.Scene {
             ).setOrigin(0,0);
 
         // white borders
-	    this.add.rectangle(0, 0, game.config.width, borderUISize, 0x006400).setOrigin(0 ,0);
-	    this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0x006400).setOrigin(0 ,0);
-	    this.add.rectangle(0, 0, borderUISize, game.config.height, 0x006400).setOrigin(0 ,0);
-	    this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0x006400).setOrigin(0 ,0);
+	 //   this.add.rectangle(0, 0, game.config.width, borderUISize, 0x006400).setOrigin(0 ,0);
+	//    this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0x006400).setOrigin(0 ,0);
+	//    this.add.rectangle(0, 0, borderUISize, game.config.height, 0x006400).setOrigin(0 ,0);
+	 //   this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0x006400).setOrigin(0 ,0);
 
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -77,7 +99,7 @@ class Play extends Phaser.Scene {
     this.anims.create({
         key: 'sroll',
         frames: this.anims.generateFrameNumbers('srollin', { start: 0, end: 2, first: 0}),
-        frameRate: 7,
+        frameRate: 10,
         repeat: -1
     });
 
@@ -118,17 +140,19 @@ class Play extends Phaser.Scene {
          if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
         this.scene.restart();
 }
-        this.starfield.tilePositionX -= 4;
+        this.starfield.tilePositionX -= 1;
+        this.bush.tilePositionX -= 3;
         if (!this.gameOver) {
         this.p1Rocket.update();
         this.ship1.update();
         this.ship2.update();
         this.ship3.update();
+        this.batship.update();
     }
-        this.shipWalk(this.ship1)
         this.checkCollision(this.p1Rocket, this.ship1);
         this.checkCollision(this.p1Rocket, this.ship2);
         this.checkCollision(this.p1Rocket, this.ship3);
+        this.checkCollisionbat(this.p1Rocket, this.batship);
 
     }
 
@@ -142,9 +166,39 @@ class Play extends Phaser.Scene {
                 rocket.reset();
                 ship.reset();  
         }
+    }    
+    checkCollisionbat(rocket, ship) {
+        if( rocket.x + rocket.width > ship.x &&
+            rocket.x < ship.x + ship.width &&
+            rocket.y + rocket.height > ship.y &&
+            rocket.y < ship.y + ship.height) {
+                ship.alpha = 0;
+                this.batshipExplode(ship)
+                rocket.reset();
+                ship.reset();  
+        }
     }
 
-    shipExplode(ship) {
+    batshipExplode(ship) {
+        // temporarily hide ship
+        ship.alpha = 0;                         
+        // create explosion sprite at ship's position
+        let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
+        boom.anims.play('explode');             // play explode animation
+        boom.on('animationcomplete', () => {    // callback after ani completes
+          ship.reset();                       // reset ship position
+          ship.alpha = 1;                     // make ship visible again
+          boom.destroy();                     // remove explosion sprite
+        });
+        // score add and repaint
+        this.p1Score += 5;
+        this.scoreLeft.text = this.p1Score;       
+        this.sound.play('sfx_explosion');
+
+        
+      }
+      
+      shipExplode(ship) {
         // temporarily hide ship
         ship.alpha = 0;                         
         // create explosion sprite at ship's position
@@ -162,6 +216,7 @@ class Play extends Phaser.Scene {
 
         
       }
+
               //walkin
               shipWalk(ship) {                     
                 // create walk sprite at ship's position
@@ -176,3 +231,9 @@ class Play extends Phaser.Scene {
 
 //POINTS:
 //60: Redesigned art, UI, and sound
+//10: Parralaxing!
+//10: animated shipe
+//20: new ship! Batty-chan!
+//dragon and sfx Oracle of Seasons, nintendo
+//bat, Castlevania, Konami
+//player sprite: myself
