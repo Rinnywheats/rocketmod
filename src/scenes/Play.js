@@ -4,9 +4,11 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('bullet', './assets/fireball.png');
         this.load.image('starfield', './assets/starfield.png');
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
+        this.load.spritesheet('srollin', './assets/walkin.png', {frameWidth: 70, frameHeight: 95, startFrame: 0, endFrame: 3});
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
     }
 
@@ -69,7 +71,16 @@ class Play extends Phaser.Scene {
             key: 'explode',
             frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9, first: 0}),
             frameRate: 30
+
 });
+    // animation walking config
+    this.anims.create({
+        key: 'sroll',
+        frames: this.anims.generateFrameNumbers('srollin', { start: 0, end: 2, first: 0}),
+        frameRate: 7,
+        repeat: -1
+    });
+
         // initialize score
         this.p1Score = 0;
 
@@ -78,7 +89,7 @@ class Play extends Phaser.Scene {
                 fontFamily: 'Courier',
                 fontSize: '28px',
                 backgroundColor: '#afeeee',
-                color: '#843605',
+                color: '#228B22',
                 align: 'right',
                 padding: {
                 top: 5,
@@ -97,6 +108,9 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
+        this.ship1.play('sroll');
+        this.ship2.play('sroll');
+        this.ship3.play('sroll');
     }
 
     update() {
@@ -111,7 +125,7 @@ class Play extends Phaser.Scene {
         this.ship2.update();
         this.ship3.update();
     }
-        
+        this.shipWalk(this.ship1)
         this.checkCollision(this.p1Rocket, this.ship1);
         this.checkCollision(this.p1Rocket, this.ship2);
         this.checkCollision(this.p1Rocket, this.ship3);
@@ -145,7 +159,19 @@ class Play extends Phaser.Scene {
         this.p1Score += 1;
         this.scoreLeft.text = this.p1Score;       
         this.sound.play('sfx_explosion');
+
+        
       }
+              //walkin
+              shipWalk(ship) {                     
+                // create walk sprite at ship's position
+                let walkin = this.add.sprite(ship.x, ship.y, 'srollin').setOrigin(0, 0);
+                walkin.anims.play('sroll');             // play  animation
+                walkin.destroy();
+                walkin.on('animationcomplete', () => {    // callback after ani completes
+                    walkin.destroy();                     // remove explosion sprite
+                  });
+          }
 }
 
 //POINTS:
